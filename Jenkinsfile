@@ -25,7 +25,10 @@ pipeline {
                 echo 'Building image inside Minikube...'
 
                 // Copy source code into Minikube
-                sh "scp -i ~/.minikube/machines/minikube/id_rsa -r ./* docker@$(minikube ip):/home/docker/"
+                script {
+                    def minikubeIp = sh(script: 'minikube ip', returnStdout: true).trim()
+                    sh "scp -i ~/.minikube/machines/minikube/id_rsa -r ./* docker@${minikubeIp}:/home/docker/"
+                }
 
                 // Build Docker image inside Minikube
                 sh "minikube ssh 'docker build -t webapp:${COMMIT_ID} /home/docker/'"
